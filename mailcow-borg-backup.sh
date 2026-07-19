@@ -126,6 +126,10 @@ if [[ "$INCLUDE_SOGO_BACKUP" == "1" ]]; then
     EXTRA_PATHS+=( "$(vol sogo-userdata-backup-vol-1)" )
 fi
 
+COMPOSE_FILES=( "${WORKDIR}/docker-compose.yml" )
+[[ -f "${WORKDIR}/docker-compose.override.yml" ]] && \
+    COMPOSE_FILES+=( "${WORKDIR}/docker-compose.override.yml" )
+
 cid() {
     local id
     id=$(docker ps -q --filter "name=$1" | head -n1)
@@ -212,7 +216,7 @@ borg --lock-wait 300 create                                     \
     ::"${BORG_PREFIX}-{now:%Y-%m-%dT%H:%M:%S}"                  \
     "${WORKDIR}/mailcow.conf"                                   \
     "${WORKDIR}/.env"                                           \
-    "${WORKDIR}/docker-compose.yml"                             \
+    "${COMPOSE_FILES[@]}"                                       \
     "${WORKDIR}/data/conf"                                      \
     "${WORKDIR}/data/assets"                                    \
     "${VOL_VMAIL}"                                              \

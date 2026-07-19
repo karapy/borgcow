@@ -59,6 +59,14 @@ command -v borg   >/dev/null || die "borg not installed"
 command -v rsync  >/dev/null || die "rsync not installed"
 command -v docker >/dev/null || die "docker not installed"
 
+# Borg 1.2 has no "latest" alias -- that arrived in Borg 2. Resolve it here so
+# the documented shorthand actually works.
+if [[ "$ARCHIVE" == "latest" ]]; then
+    ARCHIVE=$(borg list --last 1 --format '{archive}{NEWLINE}' 2>/dev/null | tail -n1)
+    [[ -n "$ARCHIVE" ]] || die "repository has no archives"
+    log "resolved 'latest' -> ${ARCHIVE}"
+fi
+
 ###############################################################################
 # PHASE 1 -- extract
 ###############################################################################
